@@ -1,0 +1,107 @@
+syntax = "proto3";
+
+package eventstream;
+
+option go_package = "kwikmedical-eventstream/proto";
+
+import "google/protobuf/timestamp.proto"; // For timestamp fields
+import "google/protobuf/duration.proto";  // For interval fields
+
+message Patient {
+  int32 patient_id = 1;
+  string nhs_number = 2;
+  string first_name = 3;
+  string last_name = 4;
+  google.protobuf.Timestamp date_of_birth = 5;
+  string address = 6;
+  string phone_number = 7;
+  string email = 8;
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message MedicalRecord {
+  int32 record_id = 1;
+  int32 patient_id = 2; // Foreign key to Patient
+  string conditions = 3;
+  string medications = 4;
+  string allergies = 5;
+  string notes = 6;
+  google.protobuf.Timestamp last_updated = 7;
+}
+
+message EmergencyCall {
+  int32 call_id = 1;
+  int32 patient_id = 2; // Foreign key to Patient
+  string nhs_number = 3; // Optional
+  string caller_name = 4;
+  string caller_phone = 5;
+  google.protobuf.Timestamp call_time = 6;
+  string medical_condition = 7;
+  string location = 8;
+  string status = 9; // e.g., "Pending", "Dispatched", "Completed"
+  int32 assigned_ambulance_id = 10; // Foreign key to Ambulance
+  int32 assigned_hospital_id = 11;  // Foreign key to Hospital
+}
+
+message Ambulance {
+  int32 ambulance_id = 1;
+  string ambulance_number = 2;
+  Location current_location = 3; // GPS coordinates
+  string status = 4;             // e.g., "Available", "On Call"
+  int32 regional_hospital_id = 5; // Foreign key to Hospital
+}
+
+message AmbulanceStaff {
+  int32 staff_id = 1;
+  string first_name = 2;
+  string last_name = 3;
+  string phone_number = 4;
+  string email = 5;
+  string role = 6; // e.g., "Paramedic", "Driver"
+  int32 ambulance_id = 7; // Foreign key to Ambulance
+  bool is_active = 8;
+}
+
+message RegionalHospital {
+  int32 hospital_id = 1;
+  string name = 2;
+  string address = 3;
+  string phone_number = 4;
+  string email = 5;
+  Location location = 6; // GPS coordinates
+  int32 capacity = 7;     // Number of beds
+  string available_resources = 8; // Specialized equipment, etc.
+  google.protobuf.Timestamp created_at = 9;
+}
+
+message CallOutDetail {
+  int32 detail_id = 1;
+  int32 call_id = 2;      // Foreign key to EmergencyCall
+  int32 ambulance_id = 3; // Foreign key to Ambulance
+  string action_taken = 4;
+  google.protobuf.Duration time_spent = 5; // Duration of the call-out
+  string notes = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message GPSData {
+  int32 gps_id = 1;
+  int32 ambulance_id = 2; // Foreign key to Ambulance
+  google.protobuf.Timestamp timestamp = 3;
+  Location location = 4;  // GPS coordinates
+}
+
+message User {
+  int32 user_id = 1;
+  string username = 2;
+  string password_hash = 3;
+  string role = 4;           // e.g., "Operator", "Hospital Staff"
+  int32 associated_staff_id = 5; // Foreign key to AmbulanceStaff
+  bool is_active = 6;
+  google.protobuf.Timestamp created_at = 7;
+}
+
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
