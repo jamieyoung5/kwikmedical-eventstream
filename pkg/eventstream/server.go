@@ -2,8 +2,8 @@ package eventstream
 
 import (
 	"context"
-	"kwikmedical-eventstream/gen"
-	v1 "kwikmedical-eventstream/gen/io/cloudevents/v1"
+	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
+	cloudeventspb "github.com/jamieyoung5/kwikmedical-eventstream/pb/io/cloudevents/v1"
 	"log"
 	"sync"
 
@@ -11,14 +11,14 @@ import (
 )
 
 type Server struct {
-	gen.UnimplementedEventStreamV1Server
+	pb.UnimplementedEventStreamV1Server
 	mu          sync.Mutex
 	subscribers map[string]*Subscriber
 }
 
 type Subscriber struct {
-	stream     gen.EventStreamV1_SubscribeToEventsServer
-	criteria   *gen.SubscriptionRequest
+	stream     pb.EventStreamV1_SubscribeToEventsServer
+	criteria   *pb.SubscriptionRequest
 	cancelFunc context.CancelFunc
 }
 
@@ -28,8 +28,8 @@ func NewServer() *Server {
 	}
 }
 
-// PublishEvent handles incoming events and distributes them to subscribers.
-func (s *Server) PublishEvent(ctx context.Context, event *v1.CloudEvent) (*gen.PublishEventResponse, error) {
+// PublishEvent handles incoming events and distributes them to subscribers
+func (s *Server) PublishEvent(ctx context.Context, event *cloudeventspb.CloudEvent) (*pb.PublishEventResponse, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 
@@ -41,14 +41,14 @@ func (s *Server) PublishEvent(ctx context.Context, event *v1.CloudEvent) (*gen.P
 		}
 	}
 
-	return &gen.PublishEventResponse{
+	return &pb.PublishEventResponse{
 		Id:      event.Id,
 		Success: true,
 	}, nil
 }
 
-// SubscribeToEvents registers a subscriber and starts sending events.
-func (s *Server) SubscribeToEvents(req *gen.SubscriptionRequest, stream gen.EventStreamV1_SubscribeToEventsServer) error {
+// SubscribeToEvents registers a subscriber and starts sending events
+func (s *Server) SubscribeToEvents(req *pb.SubscriptionRequest, stream pb.EventStreamV1_SubscribeToEventsServer) error {
 	s.mu.Lock()
 	consumerID := req.ConsumerId
 	if consumerID == "" {
@@ -76,7 +76,7 @@ func (s *Server) SubscribeToEvents(req *gen.SubscriptionRequest, stream gen.Even
 }
 
 // Unsubscribe removes a subscriber from the list.
-func (s *Server) Unsubscribe(ctx context.Context, req *gen.UnsubscribeRequest) (*emptypb.Empty, error) {
+func (s *Server) Unsubscribe(ctx context.Context, req *pb.UnsubscribeRequest) (*emptypb.Empty, error) {
 	s.mu.Lock()
 	defer s.mu.Unlock()
 

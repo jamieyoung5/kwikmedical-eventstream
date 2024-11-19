@@ -2,13 +2,13 @@ package eventstream
 
 import (
 	"fmt"
-	"kwikmedical-eventstream/gen"
-	v1 "kwikmedical-eventstream/gen/io/cloudevents/v1"
+	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
+	cloudeventspb "github.com/jamieyoung5/kwikmedical-eventstream/pb/io/cloudevents/v1"
 	"time"
 )
 
 // matches checks if the event matches the subscriber's criteria.
-func matches(criteria *gen.SubscriptionRequest, event *v1.CloudEvent) bool {
+func matches(criteria *pb.SubscriptionRequest, event *cloudeventspb.CloudEvent) bool {
 	if len(criteria.Types) > 0 {
 		match := false
 		for _, t := range criteria.Types {

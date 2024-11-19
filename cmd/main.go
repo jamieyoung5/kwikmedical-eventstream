@@ -1,9 +1,9 @@
 package main
 
 import (
+	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
+	"github.com/jamieyoung5/kwikmedical-eventstream/pkg/eventstream"
 	"google.golang.org/grpc"
-	"kwikmedical-eventstream/gen"
-	"kwikmedical-eventstream/pkg/eventstream"
 	"log"
 	"net"
 )
@@ -17,7 +17,7 @@ func main() {
 	grpcServer := grpc.NewServer()
 	eventStreamServer := eventstream.NewServer()
 
-	gen.RegisterEventStreamV1Server(grpcServer, eventStreamServer)
+	pb.RegisterEventStreamV1Server(grpcServer, eventStreamServer)
 
 	log.Println("EventStreamV1 server is running on port 50051...")
 	if err := grpcServer.Serve(lis); err != nil {
