@@ -4,7 +4,7 @@
 // 	protoc        v5.28.3
 // source: models.proto
 
-package proto
+package gen
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"

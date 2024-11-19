@@ -2,9 +2,9 @@ syntax = "proto3";
 
 package eventstream.v1;
 
-option go_package = "kwikmedical-eventstream/proto";
+option go_package = "kwikmedical-eventstream/gen";
 
-import "cloudevents.proto";
+import "io/cloudevents/v1/cloudevents.proto";
 import "google/protobuf/empty.proto";
 
 service EventStreamV1 {

@@ -4,15 +4,15 @@
 // - protoc             v5.28.3
 // source: eventstream.proto
 
-package proto
+package gen
 
 import (
-	v1 "cloudevents.io/genproto/v1"
 	context "context"
 	grpc "google.golang.org/grpc"
 	codes "google.golang.org/grpc/codes"
 	status "google.golang.org/grpc/status"
 	emptypb "google.golang.org/protobuf/types/known/emptypb"
+	v1 "kwikmedical-eventstream/gen/io/cloudevents/v1"
 )
 
 // This is a compile-time assertion to ensure that this generated file
