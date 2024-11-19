@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package eventstream;
 
-option go_package = "kwikmedical-eventstream/proto";
+option go_package = "github.com/jamieyoung5/kwikmedical-eventstream/pb";
 
 import "google/protobuf/timestamp.proto"; // For timestamp fields
 import "google/protobuf/duration.proto";  // For interval fields
