@@ -1,4 +1,4 @@
-module kwikmedical-eventstream
+module github.com/jamieyoung5/kwikmedical-eventstream
 
 go 1.23.2
 
