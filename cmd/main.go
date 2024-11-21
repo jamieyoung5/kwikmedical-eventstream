@@ -6,10 +6,13 @@ import (
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"net/http"
 )
 
-func RunVercelApp() {
-	main()
+func RunVercelApp(w http.ResponseWriter, r *http.Request) {
+	go main()
+	w.WriteHeader(http.StatusOK)
+	w.Write([]byte("gRPC Server is running"))
 }
 
 func main() {
