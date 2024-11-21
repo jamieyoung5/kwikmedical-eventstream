@@ -14,7 +14,6 @@ FROM debian:bookworm-slim
 
 COPY --from=builder /run-app /run-app
 
-# Set the environment variable for the port (optional, Fly.io provides it)
-ENV PORT 8080
+ENV PORT 4343
 
 ENTRYPOINT ["/run-app"]

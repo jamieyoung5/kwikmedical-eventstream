@@ -7,6 +7,14 @@ option go_package = "github.com/jamieyoung5/kwikmedical-eventstream/pb";
 import "google/protobuf/timestamp.proto"; // For timestamp fields
 import "google/protobuf/duration.proto";  // For interval fields
 
+message EmergencyEvent {
+  Patient patient = 1;
+  MedicalRecord medical_record = 2;
+  string medical_condition = 3;
+  string location = 4; // optional
+  string wtw_location = 5;
+}
+
 message Patient {
   int32 patient_id = 1;
   string nhs_number = 2;
@@ -21,12 +29,13 @@ message Patient {
 
 message MedicalRecord {
   int32 record_id = 1;
-  int32 patient_id = 2; // Foreign key to Patient
-  string conditions = 3;
-  string medications = 4;
-  string allergies = 5;
-  string notes = 6;
-  google.protobuf.Timestamp last_updated = 7;
+  Patient patient = 2;
+  CallOutDetail callouts = 3;
+  repeated string conditions = 4;
+  repeated string medications = 5;
+  repeated string allergies = 6;
+  repeated string notes = 7;
+  google.protobuf.Timestamp last_updated = 8;
 }
 
 message EmergencyCall {
