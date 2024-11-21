@@ -8,6 +8,10 @@ import (
 	"net"
 )
 
+func RunVercelApp() {
+	main()
+}
+
 func main() {
 	lis, err := net.Listen("tcp", ":50051")
 	if err != nil {
