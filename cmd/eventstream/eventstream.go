@@ -1,17 +1,31 @@
 package eventstream_server
 
 import (
+	"fmt"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pkg/eventstream"
 	"google.golang.org/grpc"
 	"log"
 	"net"
+	"os"
+	"time"
 )
 
 func Start() {
-	lis, err := net.Listen("tcp", ":50051")
-	if err != nil {
-		log.Fatalf("Failed to listen: %v", err)
+	var (
+		err error
+		lis net.Listener
+	)
+
+	for err != nil {
+		port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+
+		lis, err = net.Listen("tcp", port)
+		if err != nil {
+			log.Fatalf("Failed to listen: %v", err)
+		}
+		
+		time.Sleep(5 * time.Second)
 	}
 
 	grpcServer := grpc.NewServer()
