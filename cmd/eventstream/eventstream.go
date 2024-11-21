@@ -8,24 +8,15 @@ import (
 	"log"
 	"net"
 	"os"
-	"time"
 )
 
-func Start() {
-	var (
-		err error
-		lis net.Listener
-	)
+func Start() error {
 
-	for err != nil {
-		port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
-
-		lis, err = net.Listen("tcp", port)
-		if err != nil {
-			log.Fatalf("Failed to listen: %v", err)
-		}
-		
-		time.Sleep(5 * time.Second)
+	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	lis, err := net.Listen("tcp", port)
+	if err != nil {
+		log.Fatalf("Failed to listen: %v", err)
+		return err
 	}
 
 	grpcServer := grpc.NewServer()
@@ -33,8 +24,10 @@ func Start() {
 
 	pb.RegisterEventStreamV1Server(grpcServer, eventStreamServer)
 
-	log.Println("EventStreamV1 server is running on port 50051...")
-	if err := grpcServer.Serve(lis); err != nil {
+	log.Println("EventStreamV1 server is running on port " + os.Getenv("APP_PORT") + "...")
+	if err = grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
+
+	return nil
 }
