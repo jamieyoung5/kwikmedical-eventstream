@@ -30,7 +30,7 @@ message Patient {
 message MedicalRecord {
   int32 record_id = 1;
   Patient patient = 2;
-  CallOutDetail callouts = 3;
+  repeated CallOutDetail callouts = 3;
   repeated string conditions = 4;
   repeated string medications = 5;
   repeated string allergies = 6;
