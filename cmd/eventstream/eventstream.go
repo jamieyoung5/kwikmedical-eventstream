@@ -10,9 +10,11 @@ import (
 	"os"
 )
 
+const portEnvVar = "PORT"
+
 func Start() error {
 
-	port := fmt.Sprintf(":%s", os.Getenv("APP_PORT"))
+	port := fmt.Sprintf(":%s", os.Getenv(portEnvVar))
 	lis, err := net.Listen("tcp", port)
 	if err != nil {
 		log.Fatalf("Failed to listen: %v", err)
@@ -24,7 +26,7 @@ func Start() error {
 
 	pb.RegisterEventStreamV1Server(grpcServer, eventStreamServer)
 
-	log.Println("EventStreamV1 server is running on port " + os.Getenv("APP_PORT") + "...")
+	log.Println("EventStreamV1 server is running on port " + os.Getenv(portEnvVar) + "...")
 	if err = grpcServer.Serve(lis); err != nil {
 		log.Fatalf("Failed to serve: %v", err)
 	}
