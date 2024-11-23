@@ -12,7 +12,6 @@ message EmergencyEvent {
   MedicalRecord medical_record = 2;
   string medical_condition = 3;
   string location = 4; // optional
-  string wtw_location = 5;
 }
 
 message Patient {
