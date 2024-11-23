@@ -7,11 +7,57 @@ option go_package = "github.com/jamieyoung5/kwikmedical-eventstream/pb";
 import "google/protobuf/timestamp.proto"; // For timestamp fields
 import "google/protobuf/duration.proto";  // For interval fields
 
+// Enums
+enum EmergencyCallStatus {
+  UNKNOWN_EMERGENCY_CALL_STATUS = 0;
+  AMBULANCE_PENDING = 1;
+  AMBULANCE_DISPATCHED = 2;
+  AMBULANCE_COMPLETED = 3;
+}
+
+enum AmbulanceStatus {
+  UNKNOWN_AMBULANCE_STATUS = 0;
+  AVAILABLE = 1;
+  ON_CALL = 2;
+  MAINTENANCE = 3;
+}
+
+enum InjurySeverity {
+  UNKNOWN_INJURY_SEVERITY = 0;
+  LOW = 1;
+  MODERATE = 2;
+  HIGH = 3;
+  CRITICAL = 4;
+}
+
+enum StaffRole {
+  UNKNOWN_STAFF_ROLE = 0;
+  PARAMEDIC = 1;
+  DRIVER = 2;
+  OPERATOR = 3;
+  HOSPITAL_STAFF = 4;
+  OTHER = 5;
+}
+
+enum RequestStatus {
+  UNKNOWN_REQUEST_STATUS = 0;
+  PENDING = 1;
+  ACCEPTED = 2;
+  REJECTED = 3;
+  COMPLETED = 4;
+}
+
+// Messages
+message Location {
+  double latitude = 1;
+  double longitude = 2;
+}
+
 message EmergencyEvent {
   Patient patient = 1;
   MedicalRecord medical_record = 2;
   string medical_condition = 3;
-  string location = 4; // optional
+  Location location = 4; // optional
 }
 
 message Patient {
@@ -19,7 +65,7 @@ message Patient {
   string nhs_number = 2;
   string first_name = 3;
   string last_name = 4;
-  string date_of_birth = 5;
+  string date_of_birth = 5; // format - YYYY-MM-DD
   string address = 6;
   string phone_number = 7;
   string email = 8;
@@ -28,7 +74,7 @@ message Patient {
 
 message MedicalRecord {
   int32 record_id = 1;
-  Patient patient = 2;
+  int32 patient_id = 2;
   repeated CallOutDetail callouts = 3;
   repeated string conditions = 4;
   repeated string medications = 5;
@@ -45,17 +91,18 @@ message EmergencyCall {
   string caller_phone = 5;
   google.protobuf.Timestamp call_time = 6;
   string medical_condition = 7;
-  string location = 8;
-  string status = 9; // e.g., "Pending", "Dispatched", "Completed"
-  int32 assigned_ambulance_id = 10; // Foreign key to Ambulance
-  int32 assigned_hospital_id = 11;  // Foreign key to Hospital
+  Location location = 8;
+  InjurySeverity severity = 9;
+  EmergencyCallStatus status = 10;
+  int32 assigned_ambulance_id = 11; // Foreign key to Ambulance
+  int32 assigned_hospital_id = 12;  // Foreign key to Hospital
 }
 
 message Ambulance {
   int32 ambulance_id = 1;
   string ambulance_number = 2;
   Location current_location = 3; // GPS coordinates
-  string status = 4;             // e.g., "Available", "On Call"
+  AmbulanceStatus status = 4;
   int32 regional_hospital_id = 5; // Foreign key to Hospital
 }
 
@@ -65,7 +112,7 @@ message AmbulanceStaff {
   string last_name = 3;
   string phone_number = 4;
   string email = 5;
-  string role = 6; // e.g., "Paramedic", "Driver"
+  StaffRole role = 6;
   int32 ambulance_id = 7; // Foreign key to Ambulance
   bool is_active = 8;
 }
@@ -76,9 +123,8 @@ message RegionalHospital {
   string address = 3;
   string phone_number = 4;
   string email = 5;
-  Location location = 6; // GPS coordinates
+  Location location = 6;
   int32 capacity = 7;     // Number of beds
-  string available_resources = 8; // Specialized equipment, etc.
   google.protobuf.Timestamp created_at = 9;
 }
 
@@ -87,7 +133,7 @@ message CallOutDetail {
   int32 call_id = 2;      // Foreign key to EmergencyCall
   int32 ambulance_id = 3; // Foreign key to Ambulance
   string action_taken = 4;
-  google.protobuf.Duration time_spent = 5; // Duration of the call-out
+  google.protobuf.Duration time_spent = 5;
   string notes = 6;
   google.protobuf.Timestamp created_at = 7;
 }
@@ -96,20 +142,15 @@ message GPSData {
   int32 gps_id = 1;
   int32 ambulance_id = 2; // Foreign key to Ambulance
   google.protobuf.Timestamp timestamp = 3;
-  Location location = 4;  // GPS coordinates
+  Location location = 4;
 }
 
 message User {
   int32 user_id = 1;
   string username = 2;
   string password_hash = 3;
-  string role = 4;           // e.g., "Operator", "Hospital Staff"
+  StaffRole role = 4;
   int32 associated_staff_id = 5; // Foreign key to AmbulanceStaff
   bool is_active = 6;
   google.protobuf.Timestamp created_at = 7;
-}
-
-message Location {
-  double latitude = 1;
-  double longitude = 2;
 }
