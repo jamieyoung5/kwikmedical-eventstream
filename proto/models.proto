@@ -65,10 +65,10 @@ message Location {
 }
 
 message EmergencyEvent {
-  Patient patient = 1;
-  MedicalRecord medical_record = 2;
-  string medical_condition = 3;
-  Location location = 4;
+  int32 emergency_call_id = 1;
+  string medical_condition = 2;
+  Location location = 3;
+  InjurySeverity severity = 4;
 }
 
 message Patient {
