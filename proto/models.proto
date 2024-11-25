@@ -48,6 +48,17 @@ enum RequestStatus {
 }
 
 // Messages
+message AmbulanceRequest {
+  int32 request_id = 1;
+  int32 hospital_id = 2;
+  int32 emergency_call_id = 3;
+  InjurySeverity severity = 4;
+  Location location = 5;
+  RequestStatus status = 6;
+  google.protobuf.Timestamp created_at = 7;
+  google.protobuf.Timestamp updated_at = 8;
+}
+
 message Location {
   double latitude = 1;
   double longitude = 2;
@@ -57,7 +68,7 @@ message EmergencyEvent {
   Patient patient = 1;
   MedicalRecord medical_record = 2;
   string medical_condition = 3;
-  Location location = 4; // optional
+  Location location = 4;
 }
 
 message Patient {
