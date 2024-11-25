@@ -2,10 +2,12 @@ package eventutil
 
 import (
 	"context"
+	"fmt"
 	kwikmedicalpb "github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	v1 "github.com/jamieyoung5/kwikmedical-eventstream/pb/io/cloudevents/v1"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
+	"io"
 	"log"
 	"time"
 )
@@ -38,4 +40,31 @@ func Publish(
 
 	logger.Debug("Event published", zap.String("id", res.Id))
 	return res, nil
+}
+
+func Consume(
+	client kwikmedicalpb.EventStreamV1Client,
+	logger *zap.Logger,
+	subRequest *kwikmedicalpb.SubscriptionRequest,
+	handleEvent func(event *v1.CloudEvent),
+) error {
+	stream, subErr := client.SubscribeToEvents(context.Background(), subRequest)
+	if subErr != nil {
+		return fmt.Errorf("failed to subscribe to events: %v", subErr)
+	}
+
+	for {
+		event, err := stream.Recv()
+		if err == io.EOF {
+			logger.Debug("EOF received, event stream closed by server.")
+			break
+		}
+		if err != nil {
+			return fmt.Errorf("failed to receive events: %v", err)
+		}
+
+		handleEvent(event)
+	}
+
+	return nil
 }
