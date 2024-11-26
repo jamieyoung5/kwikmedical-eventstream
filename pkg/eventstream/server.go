@@ -4,6 +4,7 @@ import (
 	"context"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	cloudeventspb "github.com/jamieyoung5/kwikmedical-eventstream/pb/io/cloudevents/v1"
+	"go.uber.org/zap"
 	"log"
 	"sync"
 
@@ -14,6 +15,7 @@ type Server struct {
 	pb.UnimplementedEventStreamV1Server
 	mu          sync.Mutex
 	subscribers map[string]*Subscriber
+	logger      *zap.Logger
 }
 
 type Subscriber struct {
@@ -22,9 +24,10 @@ type Subscriber struct {
 	cancelFunc context.CancelFunc
 }
 
-func NewServer() *Server {
+func NewServer(logger *zap.Logger) *Server {
 	return &Server{
 		subscribers: make(map[string]*Subscriber),
+		logger:      logger,
 	}
 }
 
@@ -40,6 +43,8 @@ func (s *Server) PublishEvent(ctx context.Context, event *cloudeventspb.CloudEve
 			}
 		}
 	}
+
+	s.logger.Debug("successfully published event", zap.String("event", event.String()))
 
 	return &pb.PublishEventResponse{
 		Id:      event.Id,
@@ -64,14 +69,14 @@ func (s *Server) SubscribeToEvents(req *pb.SubscriptionRequest, stream pb.EventS
 	s.subscribers[consumerID] = sub
 	s.mu.Unlock()
 
-	log.Printf("Subscriber %s registered", consumerID)
+	s.logger.Debug("Subscriber registered", zap.String("consumer id", consumerID))
 
 	<-ctx.Done()
 
 	s.mu.Lock()
 	delete(s.subscribers, consumerID)
 	s.mu.Unlock()
-	log.Printf("Subscriber %s disconnected", consumerID)
+	s.logger.Debug("Subscriber disconnected", zap.String("consumer id", consumerID))
 	return nil
 }
 
@@ -83,7 +88,7 @@ func (s *Server) Unsubscribe(ctx context.Context, req *pb.UnsubscribeRequest) (*
 	if sub, exists := s.subscribers[req.ConsumerId]; exists {
 		sub.cancelFunc()
 		delete(s.subscribers, req.ConsumerId)
-		log.Printf("Subscriber %s unsubscribed", req.ConsumerId)
+		s.logger.Debug("Subscriber unsubscribed", zap.String("consumer id", req.ConsumerId))
 	}
 	return &emptypb.Empty{}, nil
 }

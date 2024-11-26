@@ -4,6 +4,7 @@ import (
 	"fmt"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pb"
 	"github.com/jamieyoung5/kwikmedical-eventstream/pkg/eventstream"
+	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"log"
 	"net"
@@ -13,6 +14,10 @@ import (
 const portEnvVar = "PORT"
 
 func Start() error {
+	logger, err := zap.NewDevelopment()
+	if err != nil {
+		return err
+	}
 
 	port := fmt.Sprintf(":%s", os.Getenv(portEnvVar))
 	lis, err := net.Listen("tcp", port)
@@ -22,7 +27,7 @@ func Start() error {
 	}
 
 	grpcServer := grpc.NewServer()
-	eventStreamServer := eventstream.NewServer()
+	eventStreamServer := eventstream.NewServer(logger)
 
 	pb.RegisterEventStreamV1Server(grpcServer, eventStreamServer)
 
